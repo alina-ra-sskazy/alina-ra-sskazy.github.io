@@ -1,0 +1,698 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Alina Ra/sskazy</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,700&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;1,8..60,400&family=Inter:wght@400;500&display=swap" rel="stylesheet">
+<link rel="shortcut icon" type="image/x-icon" href="favicon.png">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+
+:root{
+  --bg:#F6F6F4;
+  --nav-bg:#ebebea;
+  --text:#111;
+  --muted:#777;
+  --accent:#a23300;
+  --accent-light:rgba(165, 44, 0, 0.07);
+  --border:rgba(17,17,17,0.11);
+  --nav-w:22%;
+  --serif-title:'Playfair Display',Georgia,serif;
+  --serif-body:'Source Serif 4',Georgia,serif;
+  --sans:'Inter',system-ui,sans-serif;
+  --tr:0.32s cubic-bezier(0.4,0,0.2,1);
+}
+
+[data-theme="dark"]{
+  --bg:#1c1c1c;
+  --nav-bg:#0E0E0E;
+  --text:#EAEAEA;
+  --muted:#888;
+  --accent:#d9421d;
+  --accent-light:rgba(212, 70, 35, 0.09);
+  --border:rgba(234,234,234,0.09);
+}
+
+html,body{height:100%;overflow:hidden}
+
+body{
+  background:var(--bg);
+  color:var(--text);
+  font-family:var(--serif-body);
+  display:flex;
+  transition:background var(--tr),color var(--tr);
+}
+
+/* ── DIAGONAL — right side, leans top-right → bottom-left ── */
+body::before{
+  content:'';
+  position:fixed;
+  top:-30%;
+  right:6%;
+  width:1.5px;
+  height:180%;
+  background:var(--accent);
+  opacity:0.17;
+  transform:rotate(14deg);
+  transform-origin:top center;
+  pointer-events:none;
+  z-index:0;
+}
+
+/* ══════════════════════════════
+   DESKTOP NAV
+══════════════════════════════ */
+nav{
+  width:var(--nav-w);
+  min-width:220px;
+  height:100vh;
+  position:fixed;
+  top:0;left:0;
+  border-right:1px solid var(--border);
+  display:flex;
+  flex-direction:column;
+  padding:52px 0 44px;
+  z-index:10;
+  background:var(--nav-bg);
+  transition:background var(--tr);
+}
+
+.nav-header{padding:0 40px 44px}
+
+.site-title{
+  font-family:var(--serif-title);
+  font-size:24px;
+  font-weight:900;
+  letter-spacing:-0.03em;
+  line-height:1;
+  color:var(--text);
+  transition:color var(--tr);
+}
+.site-title .slash{color:var(--accent)}
+
+.site-tagline{
+  font-family:var(--sans);
+  font-size:10px;
+  letter-spacing:0.16em;
+  text-transform:uppercase;
+  color:var(--muted);
+  margin-top:10px;
+  transition:color var(--tr);
+}
+
+/* ── SOCIAL ICONS ── */
+.nav-socials{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  margin-top:18px;
+}
+.social-btn{
+  background:none;border:none;cursor:pointer;
+  padding:2px;
+  color:var(--muted);
+  transition:color var(--tr);
+  display:flex;align-items:center;justify-content:center;
+  text-decoration:none;
+}
+.social-btn:hover{color:var(--accent)}
+.social-btn svg{
+  width:15px;height:15px;display:block;
+  fill:none;stroke:currentColor;
+  stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round;
+}
+
+/* ── STORY LIST with scroll fade hint ── */
+.story-list-wrap{
+  flex:1;
+  position:relative;
+  overflow:hidden;
+  min-height:0;
+}
+
+/* fade-out at bottom to hint more content */
+.story-list-wrap::after{
+  content:'';
+  position:absolute;
+  bottom:0;left:0;right:0;
+  height:64px;
+  background:linear-gradient(to bottom,transparent,var(--nav-bg));
+  pointer-events:none;
+  z-index:2;
+  transition:opacity 0.3s ease,background var(--tr);
+}
+.story-list-wrap.at-bottom::after{opacity:0}
+
+.story-list{
+  list-style:none;
+  height:100%;
+  overflow-y:auto;
+  scrollbar-width:none;
+  padding-bottom:48px;
+}
+.story-list::-webkit-scrollbar{display:none}
+
+.story-item{
+  padding:18px 40px;
+  cursor:pointer;
+  border-left:2px solid transparent;
+  transition:border-color var(--tr),background var(--tr);
+}
+.story-item:hover .story-nav-title{color:var(--accent)}
+.story-item.active{border-left-color:var(--accent);background:var(--accent-light)}
+.story-item.active .story-nav-title{color:var(--accent)}
+
+.story-nav-title{
+  font-family:var(--serif-title);
+  font-size:14.5px;
+  font-weight:700;
+  line-height:1.3;
+  color:var(--text);
+  transition:color var(--tr);
+}
+
+/* ── NAV FOOTER ── */
+.nav-footer{
+  padding:20px 40px 0;
+  border-top:1px solid var(--border);
+  display:flex;
+  align-items:center;
+  gap:12px;
+}
+
+/* ── THEME TOGGLE (single icon, swaps) ── */
+.theme-toggle{
+  background:none;border:none;cursor:pointer;
+  padding:2px;color:var(--muted);
+  transition:color var(--tr);
+  display:flex;align-items:center;
+}
+.theme-toggle:hover{color:var(--accent)}
+.theme-toggle svg{
+  width:16px;height:16px;display:block;
+  fill:none;stroke:currentColor;
+  stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round;
+}
+
+/* light mode → show moon only */
+.theme-toggle .icon-sun{display:none}
+.theme-toggle .icon-moon{display:block}
+/* dark mode → show sun only */
+[data-theme="dark"] .theme-toggle .icon-sun{display:block}
+[data-theme="dark"] .theme-toggle .icon-moon{display:none}
+
+/* ══════════════════════════════
+   MAIN / READING AREA
+══════════════════════════════ */
+main{
+  margin-left:var(--nav-w);
+  flex:1;
+  height:100vh;
+  overflow-y:auto;
+  padding:76px 88px 120px 100px;
+  position:relative;
+  z-index:1;
+  scrollbar-width:thin;
+  scrollbar-color:var(--border) transparent;
+}
+
+.story-content{
+  max-width:650px;
+  opacity:0;
+  transform:translateY(16px);
+  transition:opacity 0.42s ease,transform 0.42s ease;
+  pointer-events:none;
+  position:absolute;
+}
+.story-content.visible{
+  opacity:1;transform:translateY(0);
+  pointer-events:auto;position:relative;
+}
+.story-content.leaving{
+  opacity:0;transform:translateY(-10px);position:absolute;
+}
+
+.story-meta{
+  font-family:var(--sans);
+  font-size:10px;font-weight:500;
+  letter-spacing:0.16em;text-transform:uppercase;
+  color:var(--accent);margin-bottom:30px;
+}
+
+.story-title{
+  font-family:var(--serif-title);
+  font-size:clamp(54px,6.5vw,84px);
+  font-weight:900;line-height:0.93;
+  letter-spacing:-0.04em;
+  color:var(--text);margin-bottom:52px;
+  transition:color var(--tr);
+}
+
+.story-body{
+  font-family:var(--serif-body);
+  font-size:17px;line-height:1.82;
+  color:var(--text);max-width:570px;
+  text-align: justify;
+  transition:color var(--tr);
+}
+.story-body p+p{margin-top:1.4em}
+
+.slash-divider{
+  font-family:var(--serif-title);
+  font-size:36px;font-weight:900;
+  color:var(--accent);opacity:0.22;
+  margin:60px 0;line-height:1;display:block;
+  letter-spacing:-0.02em;
+}
+
+/* ══════════════════════════════
+   MOBILE — hide by default
+══════════════════════════════ */
+.mobile-bar,.mobile-menu{display:none}
+
+/* ══════════════════════════════
+   MOBILE BREAKPOINT
+══════════════════════════════ */
+@media(max-width:800px){
+
+  html,body{overflow:auto;height:auto}
+
+  body::before{
+    right:-10%;opacity:0.11;
+    top:-10%;height:140%;
+  }
+
+  nav{display:none}
+
+  /* ── TOP BAR ── */
+  .mobile-bar{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    position:fixed;
+    top:0;left:0;right:0;
+    height:54px;padding:0 18px;
+    background:var(--nav-bg);
+    border-bottom:1px solid var(--border);
+    z-index:100;
+    transition:background var(--tr),border-color var(--tr);
+  }
+
+  .mobile-site-title{
+    font-family:var(--serif-title);
+    font-size:17px;font-weight:900;
+    letter-spacing:-0.03em;
+    color:var(--text);transition:color var(--tr);
+  }
+  .mobile-site-title .slash{color:var(--accent)}
+
+  .mobile-bar-right{display:flex;align-items:center;gap:0}
+
+  .icon-btn{
+    background:none;border:none;cursor:pointer;
+    padding:8px;color:var(--muted);
+    transition:color var(--tr);
+    display:flex;align-items:center;justify-content:center;
+    -webkit-tap-highlight-color:transparent;
+    min-width:40px;min-height:40px;
+  }
+  .icon-btn:active{color:var(--accent)}
+  .icon-btn svg{
+    width:18px;height:18px;display:block;
+    fill:none;stroke:currentColor;
+    stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round;
+  }
+
+  /* mobile theme icons — same swap logic, scoped to .icon-btn */
+  .icon-btn .m-icon-sun{display:none}
+  .icon-btn .m-icon-moon{display:block}
+  [data-theme="dark"] .icon-btn .m-icon-sun{display:block}
+  [data-theme="dark"] .icon-btn .m-icon-moon{display:none}
+
+  /* hamburger */
+  .hbg{display:flex;flex-direction:column;gap:5px;width:18px}
+  .hbg span{display:block;height:1.5px;background:currentColor;transition:transform 0.26s ease,opacity 0.2s ease}
+
+  /* ── OVERLAY MENU ── */
+  .mobile-menu{
+    display:flex;
+    flex-direction:column;
+    position:fixed;inset:0;
+    background:var(--nav-bg);
+    z-index:200;
+    padding-top:54px;
+    transform:translateX(100%);
+    transition:transform 0.36s cubic-bezier(0.4,0,0.2,1),background var(--tr);
+  }
+  .mobile-menu.open{transform:translateX(0)}
+
+  .mobile-menu-header{
+    display:flex;align-items:center;justify-content:space-between;
+    padding:22px 20px 18px;
+    border-bottom:1px solid var(--border);
+    flex-shrink:0;
+  }
+
+  .mobile-menu-label{
+    font-family:var(--sans);
+    font-size:9px;font-weight:500;
+    letter-spacing:0.18em;text-transform:uppercase;
+    color:var(--muted);
+  }
+
+  .close-btn{
+    background:none;border:none;cursor:pointer;
+    padding:6px;color:var(--muted);
+    font-family:var(--sans);font-size:16px;
+    -webkit-tap-highlight-color:transparent;
+    transition:color var(--tr);
+    min-width:36px;min-height:36px;
+    display:flex;align-items:center;justify-content:center;
+  }
+  .close-btn:active{color:var(--accent)}
+
+  /* scroll-hinting list wrapper inside menu */
+  .mobile-list-wrap{
+    flex:1;
+    position:relative;
+    overflow:hidden;
+    min-height:0;
+  }
+  .mobile-list-wrap::after{
+    content:'';
+    position:absolute;
+    bottom:0;left:0;right:0;
+    height:72px;
+    background:linear-gradient(to bottom,transparent,var(--nav-bg));
+    pointer-events:none;
+    z-index:2;
+    transition:opacity 0.3s ease,background var(--tr);
+  }
+  .mobile-list-wrap.at-bottom::after{opacity:0}
+
+  .mobile-story-list{
+    list-style:none;
+    height:100%;
+    overflow-y:auto;
+    scrollbar-width:none;
+    padding:4px 0 64px;
+  }
+  .mobile-story-list::-webkit-scrollbar{display:none}
+
+  .mobile-menu-footer{
+    flex-shrink:0;
+    padding:18px 20px;
+    border-top:1px solid var(--border);
+    display:flex;
+    align-items:center;
+    gap:14px;
+  }
+  .mobile-menu-footer .social-btn svg{
+    width:17px;height:17px;
+  }
+
+  .mobile-story-item{
+    padding:15px 20px;
+    cursor:pointer;
+    border-left:3px solid transparent;
+    transition:border-color var(--tr),background var(--tr);
+    -webkit-tap-highlight-color:transparent;
+  }
+  .mobile-story-item:active{background:var(--accent-light)}
+  .mobile-story-item.active{
+    border-left-color:var(--accent);
+    background:var(--accent-light);
+  }
+  .mobile-story-item.active .mobile-nav-title{color:var(--accent)}
+
+  .mobile-nav-title{
+    font-family:var(--serif-title);
+    font-size:17px;font-weight:700;
+    line-height:1.3;
+    color:var(--text);transition:color var(--tr);
+  }
+
+  /* ── MAIN on mobile ── */
+  main{
+    margin-left:0;height:auto;
+    padding:74px 22px 80px;
+    overflow-y:visible;
+  }
+
+  .story-content,.story-content.visible{position:relative}
+
+  .story-title{
+    font-size:clamp(46px,12vw,68px);
+    margin-bottom:36px;
+  }
+
+  .story-body{font-size:17px;line-height:1.78;max-width:100%}
+}
+</style>
+</head>
+<body>
+
+<!-- ══ DESKTOP NAV ══ -->
+<nav>
+  <div class="nav-header">
+    <div class="site-title">ra<span class="slash">/</span>sskazy</div>
+    <div class="site-tagline">Алина Ра</div>
+    <div class="nav-socials">
+      <!-- Instagram -->
+      <a href="https://instagram.com/arrowingen" target=_blank class="social-btn" aria-label="Instagram">
+        <svg viewBox="0 0 24 24"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>
+      </a>
+      <!-- Telegram -->
+      <a href="https://t.me/electricshadowtheatre" target=_blank class="social-btn" aria-label="Telegram">
+        <svg viewBox="0 0 24 24"><path d="M21.2 4.4L2.9 11.5c-1.2.5-1.2 1.2-.2 1.5l4.6 1.4 1.8 5.5c.2.6.5.8.9.8s.6-.2.8-.4l2.3-2.2 4.7 3.5c.9.5 1.5.2 1.7-.8l3.1-14.5c.3-1.3-.5-1.9-1.4-1.4z"/></svg>
+      </a>
+      <!-- X / Twitter -->
+      <a href="https://twitter.com/arrowingen" target=_blank class="social-btn" aria-label="X">
+        <svg viewBox="0 0 24 24"><path d="M18 4h3L13.5 11 21.5 20H15l-5-6-6 6H1l8-7.5L1 4h6.5l4.5 5.5z"/></svg>
+      </a>
+    </div>
+  </div>
+
+  <div class="story-list-wrap" id="desktopWrap">
+    <ul class="story-list" id="desktopList"></ul>
+  </div>
+
+  <div class="nav-footer">
+    <button class="theme-toggle" id="desktopTheme" aria-label="Toggle theme">
+      <svg class="icon-moon" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+      <svg class="icon-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+    </button>
+  </div>
+</nav>
+
+<!-- ══ MOBILE TOP BAR ══ -->
+<div class="mobile-bar">
+  <div class="mobile-site-title">ra<span class="slash">/</span>sskazy</div>
+  <div class="mobile-bar-right">
+    <button class="icon-btn" id="mobileTheme" aria-label="Toggle theme">
+      <svg class="m-icon-moon" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+      <svg class="m-icon-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+    </button>
+    <button class="icon-btn" id="hamburger" aria-label="Open menu">
+      <div class="hbg"><span></span><span></span><span></span></div>
+    </button>
+  </div>
+</div>
+
+<!-- ══ MOBILE OVERLAY MENU ══ -->
+<div class="mobile-menu" id="mobileMenu" aria-hidden="true">
+  <div class="mobile-menu-header">
+    <div class="mobile-menu-label">рассказы / stories</div>
+    <button class="close-btn" id="closeMenu" aria-label="Close menu">✕</button>
+  </div>
+  <div class="mobile-list-wrap" id="mobileWrap">
+    <ul class="mobile-story-list" id="mobileList"></ul>
+  </div>
+  <div class="mobile-menu-footer">
+    <a href="https://instagram.com/arrowingen" target=_blank " class="social-btn" aria-label="Instagram">
+      <svg viewBox="0 0 24 24"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>
+    </a>
+    <a href="https://t.me/electricshadowtheatre" target=_blank " class="social-btn" aria-label="Telegram">
+      <svg viewBox="0 0 24 24"><path d="M21.2 4.4L2.9 11.5c-1.2.5-1.2 1.2-.2 1.5l4.6 1.4 1.8 5.5c.2.6.5.8.9.8s.6-.2.8-.4l2.3-2.2 4.7 3.5c.9.5 1.5.2 1.7-.8l3.1-14.5c.3-1.3-.5-1.9-1.4-1.4z"/></svg>
+    </a>
+    <a href="https://twitter.com/arrowingen" target=_blank" class="social-btn" aria-label="X">
+      <svg viewBox="0 0 24 24"><path d="M18 4h3L13.5 11 21.5 20H15l-5-6-6 6H1l8-7.5L1 4h6.5l4.5 5.5z"/></svg>
+    </a>
+  </div>
+</div>
+
+<!-- ══ READING AREA ══ -->
+<main id="main">
+  <div id="storyContainer"></div>
+</main>
+
+<script>
+const stories = [
+  {
+    navTitle:"Белая ночь",
+    title:"Белая\nночь",
+    meta:"Март 2026 / noir",
+    body:`<p>Она позвонила в три часа ночи, когда небо над городом было цвета старой бумаги — не тёмным, не светлым, а тем особым белёсым, каким бывает только в июне, только здесь.</p><p>Я не спал. Сидел у окна и смотрел, как фонарь отражается в луже — дрожащее пятно света, слегка размытое, будто кто-то пытался стереть его, но передумал.</p><p>— Ты знал? — спросила она. Голос был ровный, почти деловой. Именно этот тон меня и насторожил.</p><p>— Что именно? — ответил я, хотя уже понимал.</p><span class="slash-divider">//</span><p>В Петербурге белые ночи не романтичны. Они тревожны. В них есть что-то от состояния между сном и явью — всё видно, но ничего не настоящее. Тени не те, время не то, и ты сам немного не тот.</p><p>Она замолчала. Я слышал её дыхание и где-то вдалеке — трамвай. Последний рейс, должно быть.</p><p>— Приезжай, — сказала она наконец. — Или не приезжай. Мне, кажется, уже всё равно.</p><p>Я взял пальто. Вышел в этот странный свет, где тени лежат не там, где должны.</p>`
+  },
+  {
+    navTitle:"Комната 14",
+    title:"Комната\n14",
+    meta:"Февраль 2026 / реализм",
+    body:`<p>Гостиница называлась «Центральная», хотя находилась на окраине. Это была первая ложь, которую я заметил. Потом их стало больше.</p><p>Номер четырнадцать. Две кровати, одна лампа на длинном шнуре, окно во двор. Во дворе — кирпичная стена и голубь, который каждое утро садился на один и тот же подоконник соседнего корпуса, смотрел внутрь около минуты и улетал.</p><p>Я провёл там девять дней. Считал их по голубю.</p><span class="slash-divider">//</span><p>На третий день я познакомился с администратором — женщина лет шестидесяти, с волосами цвета пепла и руками, привыкшими к бумажной работе. Она подавала ключ молча, не поднимая глаз, как будто смотреть на постояльцев было частью профессионального запрета.</p><p>— Долго ещё? — спросил я как-то вечером.</p><p>Она наконец посмотрела. Глаза оказались неожиданно молодыми.</p><p>— Это вы у себя спросите, — сказала она и вернулась к журналу.</p><p>Я вернулся в четырнадцатый. Голубь уже улетел.</p>`
+  },
+  {
+    navTitle:"Соль",
+    title:"Соль",
+    meta:"Январь 2026 / притча",
+    body:`<p>Дед хранил соль в жестяной банке из-под кофе. Банка была немецкая, с буквами, которых он не понимал, — досталась после войны, как многое другое.</p><p>Он говорил: соль — это единственное, что не портится. Всё остальное — портится. Люди, слова, намерения. А соль — нет.</p><span class="slash-divider">//</span><p>Я думал об этом, когда разбирал его вещи. Банка стояла на полке над плитой, рядом с засохшей веткой какого-то растения и фотографией, которую я никогда раньше не видел.</p><p>На фотографии был незнакомый мужчина. Молодой, в форме. На обороте — только дата: 1943.</p><p>Я открыл банку. Соль была там — белая, сухая, совершенно нетронутая временем. Я взял щепотку, попробовал на языке.</p><p>Просто соль. Ничего больше.</p><p>Но я не смог выбросить банку.</p>`
+  },
+  {
+    navTitle:"Последний автобус",
+    title:"Последний\nавтобус",
+    meta:"Декабрь 2025 / городское",
+    body:`<p>Последний автобус уходил в 23:47. Это знали все, кто жил в том районе. Знали так же твёрдо, как номера своих квартир и имена соседей по лестничной клетке.</p><p>Опоздать на него означало идти пешком — сорок минут через парк, потом мимо закрытого рынка, потом вдоль железной дороги, где по ночам особенно слышен ветер.</p><span class="slash-divider">//</span><p>Она опаздывала. Я видел это по тому, как она бежала — не паникуя, но с тем особым ритмом, когда человек точно знает: ещё можно успеть, но только если не останавливаться.</p><p>Автобус тронулся. Она добежала до остановки за секунду до того, как двери закрылись, — водитель увидел её в зеркало и подождал. Одну секунду.</p><p>Она вошла, запыхавшаяся. Огляделась. Мы с ней оказались единственными пассажирами.</p><p>— Успела, — сказала она, ни к кому конкретно не обращаясь.</p><p>— Успела, — согласился я.</p><p>Сорок минут до конечной. Никто из нас не достал телефон.</p>`
+  },
+  {
+    navTitle:"Переводчик",
+    title:"Пере\nводчик",
+    meta:"Ноябрь 2025 / эссе",
+    body:`<p>Хороший переводчик — это тот, кого не замечают. Как хороший официант, хороший дизайнер, хорошая анестезия.</p><p>Я работаю переводчиком двадцать лет. Меня не замечают.</p><span class="slash-divider">//</span><p>Однажды на конференции — технической, скучной, про логистику — я переводил речь финского инженера. Он говорил о системах хранения, о температурных режимах, о потерях при транспортировке.</p><p>Но между цифрами он вдруг сказал что-то, чего я не мог передать буквально. Финское слово, которое означает примерно «усталость вещей» — когда материал исчерпал себя, когда металл больше не хочет быть металлом.</p><p>Я перевёл это как «износ». Зал кивнул и записал.</p><p>Никто не заметил, что я только что потерял целый мир.</p><p>Иногда думаю: а вдруг это происходит постоянно? Вдруг между языками — бесчисленные пропасти, и мы просто научились делать вид, что их нет?</p>`
+  }
+];
+
+let current = -1;
+let dark = false;
+let transitioning = false;
+
+/* ── SCROLL HINT: watch list scroll, remove fade when at bottom ── */
+function initScrollHint(listEl, wrapEl) {
+  function check() {
+    const atBottom = listEl.scrollHeight - listEl.scrollTop <= listEl.clientHeight + 4;
+    wrapEl.classList.toggle('at-bottom', atBottom);
+  }
+  listEl.addEventListener('scroll', check, {passive: true});
+  // also check after content renders
+  setTimeout(check, 100);
+  return check;
+}
+
+/* ── RENDER NAV ── */
+function renderDesktopNav(){
+  const list = document.getElementById('desktopList');
+  list.innerHTML = stories.map((s,i)=>`
+    <li class="story-item${i===current?' active':''}" data-i="${i}">
+      <span class="story-nav-title">${s.navTitle}</span>
+    </li>`).join('');
+  list.querySelectorAll('.story-item').forEach(el=>{
+    el.addEventListener('click',()=>select(+el.dataset.i));
+  });
+  // recheck scroll hint after re-render
+  checkDesktopScroll && checkDesktopScroll();
+}
+
+function renderMobileNav(){
+  const list = document.getElementById('mobileList');
+  list.innerHTML = stories.map((s,i)=>`
+    <li class="mobile-story-item${i===current?' active':''}" data-i="${i}">
+      <span class="mobile-nav-title">${s.navTitle}</span>
+    </li>`).join('');
+  list.querySelectorAll('.mobile-story-item').forEach(el=>{
+    el.addEventListener('click',()=>{select(+el.dataset.i);closeMenu();});
+  });
+  checkMobileScroll && checkMobileScroll();
+}
+
+/* ── STORY ── */
+function insertStory(s, container){
+  const div = document.createElement('div');
+  div.className = 'story-content';
+  div.innerHTML = `
+    <div class="story-meta">${s.meta}</div>
+    <h1 class="story-title">${s.title.replace(/\n/g,'<br>')}</h1>
+    <div class="story-body">${s.body}</div>`;
+  container.appendChild(div);
+  requestAnimationFrame(()=>requestAnimationFrame(()=>div.classList.add('visible')));
+}
+
+function renderStory(i){
+  if(transitioning) return;
+  const container = document.getElementById('storyContainer');
+  const prev = container.querySelector('.story-content');
+  if(prev){
+    transitioning = true;
+    prev.classList.add('leaving');
+    prev.classList.remove('visible');
+    setTimeout(()=>{
+      if(prev.parentNode) prev.remove();
+      insertStory(stories[i], container);
+      transitioning = false;
+    }, 300);
+  } else {
+    insertStory(stories[i], container);
+  }
+  document.getElementById('main').scrollTo({top:0,behavior:'smooth'});
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+function select(i){
+  if(i === current) return;
+  current = i;
+  renderDesktopNav();
+  renderMobileNav();
+  renderStory(i);
+}
+
+/* ── THEME ── */
+function toggleTheme(){
+  dark = !dark;
+  document.documentElement.setAttribute('data-theme', dark ? 'dark' : '');
+  // gradient in fade hints uses --nav-bg; re-trigger check so it repaints correctly
+  setTimeout(()=>{
+    checkDesktopScroll && checkDesktopScroll();
+    checkMobileScroll && checkMobileScroll();
+  }, 350);
+}
+
+document.getElementById('desktopTheme').addEventListener('click', toggleTheme);
+document.getElementById('mobileTheme').addEventListener('click', toggleTheme);
+
+/* ── MOBILE MENU ── */
+const mobileMenu = document.getElementById('mobileMenu');
+
+function openMenu(){
+  mobileMenu.classList.add('open');
+  mobileMenu.setAttribute('aria-hidden','false');
+  document.body.style.overflow = 'hidden';
+  setTimeout(()=> checkMobileScroll && checkMobileScroll(), 50);
+}
+function closeMenu(){
+  mobileMenu.classList.remove('open');
+  mobileMenu.setAttribute('aria-hidden','true');
+  document.body.style.overflow = '';
+}
+
+document.getElementById('hamburger').addEventListener('click', openMenu);
+document.getElementById('closeMenu').addEventListener('click', closeMenu);
+
+/* ── INIT ── */
+let checkDesktopScroll, checkMobileScroll;
+
+select(0);
+
+// init scroll hints after first render
+requestAnimationFrame(()=>{
+  checkDesktopScroll = initScrollHint(
+    document.getElementById('desktopList'),
+    document.getElementById('desktopWrap')
+  );
+  checkMobileScroll = initScrollHint(
+    document.getElementById('mobileList'),
+    document.getElementById('mobileWrap')
+  );
+});
+</script>
+</body>
+</html>
